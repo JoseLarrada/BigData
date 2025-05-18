@@ -1,0 +1,35 @@
+# ==========================
+# COMANDOS DOCKER ÚTILES
+# ==========================
+
+# 🔌 Iniciar solo Kafka y Zookeeper
+docker-compose --profile kafka up -d
+
+# 🐘 Iniciar Hive (incluye HDFS y Metastore) y Spark
+docker-compose --profile hive --profile spark up -d
+
+# 🚀 Iniciar todos los servicios: Kafka, Hive, Spark y Jupyter
+docker-compose --profile kafka --profile hive --profile spark --profile jupyter up -d
+
+# ⚡ Iniciar solo Spark y Jupyter
+docker-compose --profile spark --profile jupyter up -d
+
+# 🔻 Apagar todos los contenedores
+docker-compose down
+
+# 📄 Ver logs del contenedor Jupyter
+docker logs -f jupyter
+
+# ==========================
+# 🧠 EJECUCIÓN DE SCRIPTS PYTHON CON SPARK
+# ==========================
+
+# 👇 Entrar al contenedor spark-app
+docker exec -it spark-app bash
+
+# ▶️ Ejecutar un script Python dentro del contenedor spark-app
+# (Reemplaza nombreDeArchivo por el archivo real, ej: procesamiento.py)
+docker exec -it spark-app spark-submit /app/nombreDeArchivo
+
+# Ejemplo:
+docker exec -it spark-app spark-submit /app/procesamiento.py
