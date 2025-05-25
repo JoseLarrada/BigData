@@ -29,7 +29,7 @@ docker exec -it spark-app bash
 
 # ▶️ Ejecutar un script Python dentro del contenedor spark-app
 # (Reemplaza nombreDeArchivo por el archivo real, ej: procesamiento.py)
-docker exec -it spark-app spark-submit /app/nombreDeArchivo
+spark-submit /app/procesamiento.py
 
 # Ejemplo:
 docker exec -it spark-app spark-submit /app/procesamiento.py
