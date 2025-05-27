@@ -1,0 +1,41 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instala dependencias básicas
+RUN apt-get update && apt-get install -y \
+    openjdk-11-jdk \
+    python3 \
+    curl \
+    net-tools \
+    vim \
+    tar \
+    && apt-get clean
+
+# Copia el tar.gz de Impala al contenedor
+COPY apache-impala-4.4.1.tar.gz /opt/
+
+# Extrae Impala
+RUN tar -xzf /opt/apache-impala-4.4.1.tar.gz -C /opt/ && \
+    mv /opt/apache-impala-4.4.1 /opt/impala
+
+# Establece variables de entorno necesarias
+ENV IMPALA_HOME=/opt/impala
+ENV PATH=$PATH:$IMPALA_HOME/bin
+
+# Crea carpeta de logs
+RUN mkdir -p /var/log/impala && chmod -R 777 /var/log/impala
+
+# Expón los puertos típicos de impalad
+EXPOSE 25000 25010 21000
+
+# Comando para correr impalad conectándose al metastore externo
+CMD ["/opt/impala/bin/impalad", \
+     "--hostname=0.0.0.0", \
+     "--be_port=22000", \
+     "--log_dir=/var/log/impala", \
+     "--state_store_port=24000", \
+     "--use_statestore=false", \
+     "--use_local_catalog=true", \
+     "--catalog_service_host=localhost", \
+     "--fe_service_threads=64"]

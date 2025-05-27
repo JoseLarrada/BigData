@@ -88,12 +88,11 @@ if __name__ == "__main__":
         .config("spark.sql.parquet.enableVectorizedReader", "false") \
         .getOrCreate()
 
-    # Ajusta aquí el nombre de tu carpeta de entrada y salida
     carpeta_entrada = "data/Visitas_lote_02_parquet"
     carpeta_salida = "data/Visitas_lote_02_parquet_kpi_parquet"
     batch_size = 1
 
-    # Limpiar carpeta de salida si existe (opcional, solo la primera vez)
+    # Limpiar carpeta de salida
     if os.path.exists(carpeta_salida):
         import shutil
         shutil.rmtree(carpeta_salida)

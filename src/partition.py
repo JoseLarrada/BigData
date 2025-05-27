@@ -2,7 +2,6 @@ import os
 import csv
 import sys
 
-# Aumentar el límite de tamaño de campo
 csv.field_size_limit(sys.maxsize)
 
 def dividir_csv(input_path, output_dir, filas_por_archivo=100000):
@@ -37,7 +36,7 @@ def dividir_csv(input_path, output_dir, filas_por_archivo=100000):
 
     print(f"✔ División completa: {archivo_num} archivos creados en {output_dir}")
 
-# Ejemplo de uso
+
 input_csv = "data/Visitas_lote_02.csv"
 output_folder = "data/Visitas_lote_02_dividido"
 dividir_csv(input_csv, output_folder, filas_por_archivo=100000)

@@ -1,0 +1,7 @@
+FROM apache/impala:4.4.1-catalogd
+
+# Copiar los JARs al directorio de librerías de Impala
+COPY libs/datanucleus-api-jdo-5.2.4.jar /opt/impala/lib/
+COPY libs/datanucleus-core-5.2.4.jar /opt/impala/lib/
+COPY libs/datanucleus-rdbms-5.2.4.jar /opt/impala/lib/
+COPY libs/jdo-api-3.2.jar /opt/impala/lib/

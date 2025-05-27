@@ -1,19 +1,21 @@
+version: "3.8"
+
 services:
-  # ZOOKEEPER (kafka)
+  # ZOOKEEPER (Kafka)
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
-    hostname: zookeeper
     container_name: zookeeper
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     profiles: ["kafka"]
+    networks:
+      - bigdata-net
 
   # KAFKA
   kafka:
     image: confluentinc/cp-kafka:7.4.0
-    hostname: kafka
     container_name: kafka
     depends_on:
       - zookeeper
@@ -25,8 +27,10 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     profiles: ["kafka"]
+    networks:
+      - bigdata-net
 
-  # HADOOP NAMENODE (hive)
+  # HADOOP NAMENODE
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
@@ -37,8 +41,10 @@ services:
     volumes:
       - namenode:/hadoop/dfs/name
     profiles: ["hive"]
+    networks:
+      - bigdata-net
 
-  # HADOOP DATANODE (hive)
+  # HADOOP DATANODE
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode
@@ -52,25 +58,10 @@ services:
     volumes:
       - datanode:/hadoop/dfs/data
     profiles: ["hive"]
+    networks:
+      - bigdata-net
 
-  # HIVE METASTORE (hive)
-  hive-metastore:
-    image: bde2020/hive:2.3.2-postgresql-metastore
-    container_name: hive-metastore
-    depends_on:
-      - namenode
-      - datanode
-    environment:
-      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: jdbc:postgresql://hivemetastoredb:5432/metastore
-      HIVE_CORE_CONF_javax_jdo_option_ConnectionDriverName: org.postgresql.Driver
-      HIVE_CORE_CONF_javax_jdo_option_ConnectionUserName: hive
-      HIVE_CORE_CONF_javax_jdo_option_ConnectionPassword: hive
-      HIVE_METASTORE_PORT: 9083
-    ports:
-      - "9083:9083"
-    profiles: ["hive"]
-
-  # POSTGRES PARA HIVE (hive)
+  # POSTGRESQL para Hive Metastore
   hivemetastoredb:
     image: postgres:13
     container_name: hivemetastoredb
@@ -81,24 +72,50 @@ services:
     ports:
       - "5432:5432"
     profiles: ["hive"]
+    volumes:
+      - metastore-db:/var/lib/postgresql/data
+    networks:
+      - bigdata-net
 
-  # IMPALA (impala)
+  # HIVE METASTORE
+  hive-metastore:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive-metastore
+    depends_on:
+      - namenode
+      - datanode
+      - hivemetastoredb
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: jdbc:postgresql://hivemetastoredb:5432/metastore
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionDriverName: org.postgresql.Driver
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionUserName: hive
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionPassword: hive
+      HIVE_METASTORE_PORT: 9083
+    ports:
+      - "9083:9083"
+    profiles: ["hive"]
+    networks:
+      - bigdata-net
+
+  # IMPALA
   impala:
-    image: bigdataeng/impala
+    image: apache/impala:4.5.0-impala_quickstart_hms
     container_name: impala
+    ports:
+      - "25000:25000"  # Web UI
+      - "21050:21050"  # JDBC/ODBC
+    environment:
+      - HIVE_METASTORE_URI=thrift://hive-metastore:9083
+    command: bash -c "while true; do sleep 1000; done"
     depends_on:
       - hive-metastore
       - namenode
       - datanode
-    ports:
-      - "21050:21050"   # Puerto JDBC
-      - "25000:25000"   # Web UI opcional
-    environment:
-      - HADOOP_CONF_DIR=/etc/hadoop/conf
-      - IMPALA_STATE_STORE_HOST=impala
     profiles: ["impala"]
+    networks:
+      - bigdata-net
 
-  # SPARK MASTER UI (spark)
+  # SPARK MASTER
   spark:
     image: bitnami/spark:3.3
     container_name: spark
@@ -109,8 +126,10 @@ services:
       - "8080:8080"
       - "7077:7077"
     profiles: ["spark"]
+    networks:
+      - bigdata-net
 
-  # SPARK APP PYTHON (spark)
+  # SPARK APP PYTHON
   spark-app:
     build:
       context: .
@@ -123,7 +142,13 @@ services:
       - spark
     command: sleep infinity
     profiles: ["spark"]
+    networks:
+      - bigdata-net
 
 volumes:
   namenode:
   datanode:
+  metastore-db:
+
+networks:
+  bigdata-net:

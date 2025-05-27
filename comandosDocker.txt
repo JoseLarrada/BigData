@@ -25,7 +25,7 @@ docker logs -f jupyter
 # ==========================
 
 # 👇 Entrar al contenedor spark-app
-docker exec -it spark-app bash
+docker exec -it spark-app-run bash
 
 # ▶️ Ejecutar un script Python dentro del contenedor spark-app
 # (Reemplaza nombreDeArchivo por el archivo real, ej: procesamiento.py)

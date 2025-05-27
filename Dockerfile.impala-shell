@@ -1,0 +1,15 @@
+FROM python:3.9-slim
+
+# Instala dependencias de sistema necesarias para compilar sasl
+RUN apt-get update && \
+    apt-get install -y gcc g++ libsasl2-dev wget python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Descarga el script oficial impala-shell.py
+RUN wget https://raw.githubusercontent.com/apache/impala/4.2.0/shell/impala_shell.py -O /usr/local/bin/impala-shell && \
+    chmod +x /usr/local/bin/impala-shell
+
+# Instala dependencias Python requeridas por impala-shell
+RUN pip install --no-cache-dir bit_array six sasl thrift==0.13.0 thrift_sasl==0.4.2
+
+ENTRYPOINT ["tail", "-f", "/dev/null"]

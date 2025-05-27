@@ -1,0 +1,23 @@
+# Dockerfile-catalogd
+FROM apache/impala:4.4.1-catalogd
+
+# Cambiar a root para copiar y cambiar permisos sin problemas
+USER root
+
+# Copiar librerías necesarias
+COPY libs/datanucleus-api-jdo-5.2.4.jar /opt/impala/lib/
+COPY libs/datanucleus-core-5.2.4.jar /opt/impala/lib/
+COPY libs/datanucleus-rdbms-5.2.4.jar /opt/impala/lib/
+COPY libs/jdo-api-3.2.jar /opt/impala/lib/
+
+# Ajustar permisos
+RUN chmod 644 /opt/impala/lib/*.jar
+
+# Volver a usuario impala
+USER impala
+
+# Exponer puertos que usa catalogd
+EXPOSE 25020
+
+# Comando por defecto para correr catalogd
+CMD ["/usr/bin/catalogd"]
