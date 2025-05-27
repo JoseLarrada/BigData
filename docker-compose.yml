@@ -145,6 +145,23 @@ services:
     networks:
       - bigdata-net
 
+  spark-app-run:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spark-app-run
+    volumes:
+      - ./src:/app
+      - ./data:/app/data
+    depends_on:
+      - spark
+    command: sleep infinity
+    profiles: ["spark"]
+    networks:
+      - bigdata-net
+    ports:
+    - "8000:8000"
+
 volumes:
   namenode:
   datanode:

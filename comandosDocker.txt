@@ -20,12 +20,20 @@ docker-compose down
 # 📄 Ver logs del contenedor Jupyter
 docker logs -f jupyter
 
+#Crear fastApi
+pip install fastapi uvicorn kafka-python
+
+
 # ==========================
 # 🧠 EJECUCIÓN DE SCRIPTS PYTHON CON SPARK
 # ==========================
 
 # 👇 Entrar al contenedor spark-app
 docker exec -it spark-app-run bash
+docker exec -it spark-app bash
+#Ejecutar servidor
+uvicorn servidor_ws:app --host 0.0.0.0 --port 8000
+
 
 # ▶️ Ejecutar un script Python dentro del contenedor spark-app
 # (Reemplaza nombreDeArchivo por el archivo real, ej: procesamiento.py)
