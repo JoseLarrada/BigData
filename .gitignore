@@ -1,2 +1,7 @@
 data
 entornoVirtual
+metastore_db
+muestras
+spark-warehouse
+datos_parquet
+spark-warehouse

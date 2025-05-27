@@ -1,6 +1,5 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, year, month, dayofmonth, date_format, to_date
-from export_utils import save_to_gcs, load_to_bigquery
 
 
 base_path = "datos_parquet/"
